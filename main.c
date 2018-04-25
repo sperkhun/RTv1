@@ -21,28 +21,138 @@ void    draw_pixel(SDL_Surface *screen, int x, int y, t_vector col)
         return ;
     pix = (unsigned char*)screen->pixels;
     a = x * 4 + y * screen->pitch;
-    pix[a++] = col[2];
-    pix[a++] = col[1];
-    pix[a++] = col[0];
+    pix[a++] = col[2] > 255 ? 255 : col[2];
+    pix[a++] = col[1] > 255 ? 255 : col[1];
+    pix[a++] = col[0] > 255 ? 255 : col[0];
 }
 
-void    draw_scene(SDL_Surface *screen, t_sphere sphere, t_camera camera, t_light light)
+double      lighting(t_vector p, t_vector n, t_vector v, t_light *light, t_sphere sphere)
+{
+    t_vector l;
+    t_vector r;
+    double     i;
+    double     n_l;
+    double     r_v;
+    int a;
+
+    i = 0.0;
+    a = 0;
+    while (a < 1)
+    {
+        l = light[a].v - p;
+        n_l = (n * l)[0] + (n * l)[1] + (n * l)[2];
+        if (n_l > 0)
+            i += light[a].intensity * n_l / (LENGTH(n) * LENGTH(l));
+        if (sphere.specular != -1)
+        {
+            r = MULT(n, 2 * SCALAR(n, l)) - l;
+            r_v = SCALAR(r, v);
+            if (r_v > 0)
+            {
+                i += light[a].intensity * pow(r_v / (LENGTH(r) * LENGTH(v)), sphere.specular);
+            }
+        }
+        a++;
+    }
+    return (i);
+}
+
+void cl_inter(t_camera camera, t_sphere *sphere)
+{
+    double disc;
+    t_vector oc;
+    t_vector k;
+
+    oc = camera.ov - sphere->v;
+    k[0] = SCALAR(camera.vv, camera.vv);
+    k[1] = 2 * SCALAR(oc, camera.vv);
+    k[2] = SCALAR(oc, oc) - sphere->r * sphere->r;
+    disc = k[1] * k[1] - 4 * k[0] * k[2];
+    if (disc < 0)
+    {
+        sphere->t1 = 10000;
+        sphere->t2 = 10000;
+    }
+    sphere->t1 = (-k[1] + sqrt(disc)) / (2 * k[0]);
+    sphere->t2 = (-k[1] - sqrt(disc)) / (2 * k[0]);
+}
+
+// void cl_inter_c(t_camera camera, t_sphere *sphere)
+// {
+//     double disc;
+//     t_vector oc;
+//     t_vector k;
+
+//     oc = camera.ov - sphere->v;
+//     k[0] = SCALAR(camera.vv, camera.vv) - pow(SCALAR(camera.vv, sphere->vv), 2);
+//     k[1] = 2 * (SCALAR(oc, camera.vv) - SCALAR(camera.vv, sphere->vv) * SCALAR(oc, sphere->vv));
+//     k[2] = SCALAR(oc, oc) - pow(SCALAR(oc, sphere->vv), 2) - sphere->r * sphere->r;
+//     disc = k[1] * k[1] - 4 * k[0] * k[2];
+//     if (disc < 0)
+//     {
+//         sphere->t1 = 10000;
+//         sphere->t2 = 10000;
+//     }
+//     sphere->t1 = (-k[1] + sqrt(disc)) / (2 * k[0]);
+//     sphere->t2 = (-k[1] - sqrt(disc)) / (2 * k[0]);
+// }
+
+int intersection(t_objects objects, double t_min, double t_max, double *cl_t)
+{
+    int a;
+    int i;
+    double t[2];
+
+    *cl_t = t_max;
+    a = -1;
+    i = 0;
+    while (i < 2)
+    {
+        cl_inter(objects.camera, &objects.sphere[i]);
+        t[0] = objects.sphere[i].t1;
+        t[1] = objects.sphere[i].t2;
+        if (t[0] >= t_min && t[0] < 10000 && t[0] < *cl_t)
+        {
+            *cl_t = t[0];
+            a = i;
+        }
+        if (t[1] >= t_min && t[1] < 10000 && t[1] < *cl_t)
+        {
+            *cl_t = t[1];
+            a = i;
+        }
+        i++;
+    }
+    return (a);
+}
+
+t_vector traceray(t_objects objects)
+{
+    t_vector    p;
+    t_vector    n;
+    t_vector    color;
+    double      i;
+    int         a;
+    // double m;
+
+    a = intersection(objects, 1, 10000, &objects.cl_t);
+    if (a < 0)
+        return ((t_vector){0, 0, 0});
+    p = objects.camera.ov + MULT(objects.camera.vv, objects.cl_t);
+    //m = SCALAR(objects.camera.vv, objects.sphere[a].vv) * objects.cl_t + SCALAR(objects.camera.ov - objects.sphere[a].v, objects.sphere[a].vv);
+    n = p - objects.sphere[a].v;
+    //n = p - objects.sphere[a].v - MULT(objects.sphere[a].vv, m);
+    n = DIV(n, LENGTH(n));
+    i = lighting(p, n, -objects.camera.vv, objects.light, objects.sphere[a]);
+    color = MULT(objects.sphere[a].col, i);
+    return (color);
+}
+
+void draw(SDL_Surface *screen, t_objects objects)
 {
     int x;
     int y;
-    double cl_t;
-    double t1;
-    double t2;
-    double k1;
-    double k2;
-    double k3;
-    double disc;
-    t_vector oc;
-    t_vector tmp;
-    t_vector p;
-    t_vector n;
-    t_vector l;
-    double     i;
+    t_vector color;
 
     y = -(WIN_H / 2);
     while (y < WIN_H / 2)
@@ -50,41 +160,9 @@ void    draw_scene(SDL_Surface *screen, t_sphere sphere, t_camera camera, t_ligh
         x = -(WIN_W / 2);
         while (x < WIN_W / 2)
         {
-            camera.vv = (t_vector){x * camera.d / WIN_W, y * 0.8 / WIN_H, 1.0};
-            cl_t = 10000;
-            oc = camera.ov - sphere.v;
-            tmp = camera.vv * camera.vv;
-            k1 = tmp[0] + tmp[1] + tmp[2];
-            tmp = oc * camera.vv;
-            k2 = 2 * (tmp[0] + tmp[1] + tmp[2]);
-            tmp = oc * oc;
-            k3 = (tmp[0] + tmp[1] + tmp[2]) - sphere.r * sphere.r;
-            disc = k2 * k2 - 4 * k1 * k3;
-            if (disc < 0)
-            {
-                x++;
-                continue ;
-            }
-            t1 = (-k2 + sqrt(disc)) / (2 * k1);
-            t2 = (-k2 - sqrt(disc)) / (2 * k1);
-            if (t1 >= 1 && t1 <= 10000 && t1 < cl_t)
-                cl_t = t1;
-            if (t2 >= 1 && t2 <= 10000 && t2 < cl_t)
-                cl_t = t2;
-            if (cl_t < 10000)
-            {
-                i = 0.0;
-                p = camera.ov + (t_vector){cl_t, cl_t, cl_t} * camera.vv;
-                n = p - sphere.v;
-                n = n / (t_vector){sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]), sqrt(n[0] * n[0]\
-                    + n[1] * n[1] + n[2] * n[2]), sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2])};
-                l = light.v - p;
-                t1 = (n * l)[0] + (n * l)[1] + (n * l)[2];
-                if (t1 > 0)
-                    i = light.intensity * t1 / ((sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2])) *\
-                        (sqrt(l[0] * l[0] + l[1] * l[1] + l[2] * l[2])));
-                draw_pixel(screen, x + WIN_W / 2, WIN_H / 2 - y, sphere.col * (t_vector){i, i, i});
-            }
+            objects.camera.vv = (t_vector){x * objects.camera.d / WIN_W, y * 0.8 / WIN_H, 1.0};
+            color = traceray(objects);
+            draw_pixel(screen, x + WIN_W / 2, WIN_H / 2 - y, color);
             x++;
         }
         y++;
@@ -97,9 +175,7 @@ int main()
     SDL_Event event;
     SDL_Window *win;
     SDL_Surface *screen;
-    t_sphere sphere;
-    t_camera camera;
-    t_light  light;
+    t_objects objects;
     
     SDL_Init(SDL_INIT_EVERYTHING);
     win = SDL_CreateWindow("Hello SDL World",\
@@ -108,21 +184,25 @@ int main()
         exit (1);
     screen = SDL_GetWindowSurface(win);
     // const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
-    
-    camera.ov = (t_vector){0, 0, 0};
-    camera.d = 1;
-    light.v = (t_vector){4, 2, 0};
-    light.intensity = 0.8;
+    objects.sphere = (t_sphere*)malloc(sizeof(t_sphere) * 2);
+    objects.light = (t_light*)malloc(sizeof(t_light) * 2);
+    objects.camera.ov = (t_vector){0, 0, 0};
+    objects.camera.d = 1;
+    objects.light[0].v = (t_vector){4, 2, 0};
+    objects.light[0].intensity = 0.9;
+    // objects.light[1].v = (t_vector){-10, 1, 2};
+    // objects.light[1].intensity = 0.6;
+    objects.sphere[0].v = (t_vector){0, -9001, 0};
+    objects.sphere[0].r = 9000;
+    objects.sphere[0].specular = -1;
+    objects.sphere[0].col = (t_vector){0, 255, 0};
+    objects.sphere[1].v = (t_vector){0, 0, 5.0};
+    objects.sphere[1].r = 1;
+    objects.sphere[1].specular = -1;
+    objects.sphere[1].col = (t_vector){255, 0, 0};
     SDL_LockSurface(screen);
     ft_memset(screen->pixels, 0, screen->h * screen->pitch);
-    sphere.v = (t_vector){0, -5001, 0};
-    sphere.r = 5000;
-    sphere.col = (t_vector){0, 255, 0};
-    draw_scene(screen, sphere, camera, light);
-    sphere.v = (t_vector){0, 0, 5.0};
-    sphere.r = 1;
-    sphere.col = (t_vector){255, 0, 0};
-    draw_scene(screen, sphere, camera, light);
+    draw(screen, objects);
     SDL_UnlockSurface(screen);
     SDL_UpdateWindowSurface(win);
     while (running)
