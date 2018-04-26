@@ -14,7 +14,7 @@ NAME = rtv1
 
 FLAGS = -Wall -Wextra -Werror
 
-SRC = main.c
+SRC = main.c draw.c intersection.c lighting.c traceray.c read_scene.c
 
 OBJ = $(SRC:.c=.o)
 

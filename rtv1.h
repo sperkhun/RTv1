@@ -37,31 +37,23 @@
 
 typedef double	t_vector __attribute__((vector_size(sizeof(double)*3)));
 
-typedef struct  s_sphere
+typedef struct  s_object
 {
 	t_vector v;
 	t_vector col;
 	double r;
+	double k;
 	double specular;
 	double t1;
 	double t2;
-}				t_sphere;
-
-// typedef struct  s_sphere
-// {
-// 	t_vector v;
-// 	t_vector vv;
-// 	t_vector col;
-// 	double r;
-// 	double specular;
-// 	double t1;
-// 	double t2;
-// }				t_sphere;
+	char   *type;
+}				t_object;
 
 typedef struct  s_camera
 {
 	t_vector ov;
 	t_vector vv;
+	t_vector rot;
 	double d;
 }				t_camera;
 
@@ -71,12 +63,20 @@ typedef struct  s_light
 	double intensity;
 }				t_light;
 
-typedef struct  s_objects
+typedef struct  s_scene
 {
 	t_camera	camera;
 	t_light		*light;
-	t_sphere	*sphere;
+	t_object	*object;
 	double		cl_t;
-}				t_objects;
+	int			l;
+	int			o;
+}				t_scene;
+
+void			draw(SDL_Surface *screen, t_scene scene);
+t_vector		traceray(t_scene scene);
+double			lighting(t_vector p, t_vector n, t_vector v, t_scene scene, t_object object);
+int				intersection(t_object *object, t_vector o, t_vector v, double t_min, double t_max, double *cl_t);
+void read_scene(t_scene *scene, char *str);
 
 #endif
