@@ -14,8 +14,8 @@
 
 static void	draw_pixel(SDL_Surface *screen, int x, int y, t_vector col)
 {
-	unsigned char *pix;
-	int a;
+	unsigned char	*pix;
+	int				a;
 
 	if (x < 0 || y < 0 || x >= WIN_W || y >= WIN_H)
 		return ;
@@ -28,9 +28,9 @@ static void	draw_pixel(SDL_Surface *screen, int x, int y, t_vector col)
 
 void		draw(SDL_Surface *screen, t_scene scene)
 {
-	int x;
-	int y;
-	t_vector color;
+	int			x;
+	int			y;
+	t_vector	color;
 
 	y = -(WIN_H / 2);
 	while (y < WIN_H / 2)
@@ -40,6 +40,8 @@ void		draw(SDL_Surface *screen, t_scene scene)
 		{
 			scene.camera.vv = (t_vector){x * scene.camera.d / WIN_W, y *\
 				0.8 / WIN_H, 1.0};
+			scene.camera.vv += scene.camera.rot;
+			scene.camera.vv = DIV(scene.camera.vv, LENGTH(scene.camera.vv));
 			color = traceray(scene);
 			draw_pixel(screen, x + WIN_W / 2, WIN_H / 2 - y, color);
 			x++;

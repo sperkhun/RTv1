@@ -12,16 +12,16 @@
 
 #include "rtv1.h"
 
-t_vector traceray(t_scene scene)
+t_vector	traceray(t_scene scene)
 {
 	t_vector	p;
 	t_vector	n;
 	t_vector	color;
-	double	i;
-	int	a;
-	double m;
+	double		i;
+	int			a;
+	double		m;
 
-	a = intersection(scene.object, scene.camera.ov, scene.camera.vv, 1, 10000, &scene.cl_t);
+	a = intersection(&scene, scene.camera.ov, scene.camera.vv, 1, 10000);
 	if (a < 0)
 		return ((t_vector){0, 0, 0});
 	p = scene.camera.ov + MULT(scene.camera.vv, scene.cl_t);
@@ -29,13 +29,16 @@ t_vector traceray(t_scene scene)
 		n = p - scene.object[a].v;
 	else if (!ft_strcmp(scene.object[a].type, "CYLINDER"))
 	{
-		m = SCALAR(scene.camera.vv, ((t_vector){0, 1, 0})) * scene.cl_t + SCALAR(scene.camera.ov - scene.object[a].v, ((t_vector){0, 1, 0}));
-		n = p - scene.object[a].v - MULT(((t_vector){0, 1, 0}), m);
+		m = SCALAR(scene.camera.vv, scene.object[a].rot) * scene.cl_t +\
+			SCALAR(scene.camera.ov - scene.object[a].v, scene.object[a].rot);
+		n = p - scene.object[a].v - MULT(scene.object[a].rot, m);
 	}
 	else
 	{
-		m = SCALAR(scene.camera.vv, ((t_vector){0, 1, 0})) * scene.cl_t + SCALAR(scene.camera.ov - scene.object[a].v, ((t_vector){0, 1, 0}));
-		n = p - scene.object[a].v - MULT(((t_vector){0, 1, 0}), (m * (1 + pow(scene.object[a].k, 2))));
+		m = SCALAR(scene.camera.vv, scene.object[a].rot) * scene.cl_t +\
+			SCALAR(scene.camera.ov - scene.object[a].v, scene.object[a].rot);
+		n = p - scene.object[a].v - MULT(scene.object[a].rot, (m *\
+			(1 + pow(scene.object[a].r, 2))));
 	}
 	n = DIV(n, LENGTH(n));
 	i = lighting(p, n, -scene.camera.vv, scene, scene.object[a]);

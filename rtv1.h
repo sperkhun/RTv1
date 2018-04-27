@@ -41,8 +41,8 @@ typedef struct  s_object
 {
 	t_vector v;
 	t_vector col;
+	t_vector rot;
 	double r;
-	double k;
 	double specular;
 	double t1;
 	double t2;
@@ -76,7 +76,7 @@ typedef struct  s_scene
 void			draw(SDL_Surface *screen, t_scene scene);
 t_vector		traceray(t_scene scene);
 double			lighting(t_vector p, t_vector n, t_vector v, t_scene scene, t_object object);
-int				intersection(t_object *object, t_vector o, t_vector v, double t_min, double t_max, double *cl_t);
+int				intersection(t_scene *scene, t_vector o, t_vector v, double t_min, double t_max);
 void read_scene(t_scene *scene, char *str);
 
 #endif
