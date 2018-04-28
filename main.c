@@ -6,22 +6,23 @@
 /*   By: sperkhun <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 17:20:22 by sperkhun          #+#    #+#             */
-/*   Updated: 2018/04/27 17:44:11 by sperkhun         ###   ########.fr       */
+/*   Updated: 2018/04/28 11:39:13 by sperkhun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "rtv1.h"
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	int running = 1;
-	SDL_Event event;
-	SDL_Window *win;
-	SDL_Surface *screen;
-	t_scene scene;
+	int			running;
+	SDL_Event	event;
+	SDL_Window	*win;
+	SDL_Surface	*screen;
+	t_scene		scene;
 
 	if (argc != 2)
 		return (0);
+	running = 1;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	win = SDL_CreateWindow("Hello SDL World", SDL_WINDOWPOS_UNDEFINED,\
 			SDL_WINDOWPOS_UNDEFINED, WIN_W, WIN_H, SDL_WINDOW_ALLOW_HIGHDPI);

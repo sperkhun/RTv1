@@ -33,37 +33,37 @@
 
 # define MULT(v, n) v * (t_vector){n, n, n}
 
-# define DIV(v, n) v / (t_vector){n, n, n}
+# define DIV(v, n) n ? v / (t_vector){n, n, n} : (t_vector){0, 0, 0};
 
 typedef double	t_vector __attribute__((vector_size(sizeof(double)*3)));
 
-typedef struct  s_object
+typedef struct	s_object
 {
-	t_vector v;
-	t_vector col;
-	t_vector rot;
-	double r;
-	double specular;
-	double t1;
-	double t2;
-	char   *type;
+	t_vector	v;
+	t_vector	col;
+	t_vector	rot;
+	double		r;
+	double		specular;
+	double		t1;
+	double		t2;
+	char		*type;
 }				t_object;
 
-typedef struct  s_camera
+typedef struct	s_camera
 {
-	t_vector ov;
-	t_vector vv;
-	t_vector rot;
-	double d;
+	t_vector	ov;
+	t_vector	vv;
+	t_vector	rot;
+	double		d;
 }				t_camera;
 
-typedef struct  s_light
+typedef struct	s_light
 {
-	t_vector v;
-	double intensity;
+	t_vector	v;
+	double		intensity;
 }				t_light;
 
-typedef struct  s_scene
+typedef struct	s_scene
 {
 	t_camera	camera;
 	t_light		*light;
@@ -75,8 +75,10 @@ typedef struct  s_scene
 
 void			draw(SDL_Surface *screen, t_scene scene);
 t_vector		traceray(t_scene scene);
-double			lighting(t_vector p, t_vector n, t_vector v, t_scene scene, t_object object);
-int				intersection(t_scene *scene, t_vector o, t_vector v, double t_min, double t_max);
-void read_scene(t_scene *scene, char *str);
+double			lighting(t_vector p, t_vector n, t_vector v, t_scene scene,\
+							t_object object);
+int				intersection(t_scene *scene, t_vector o, t_vector v,\
+							double t_min, double t_max);
+void			read_scene(t_scene *scene, char *str);
 
 #endif

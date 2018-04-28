@@ -25,17 +25,17 @@ static t_vector	coefficients(t_object *obj, t_vector d, t_vector oc)
 	if (!ft_strcmp(obj->type, "CYLINDER"))
 	{
 		k[0] = SCALAR(d, d) - pow(SCALAR(d, obj->rot), 2);
-		k[1] = 2 * (SCALAR(oc, d) - SCALAR(d, obj->rot) * SCALAR(oc, obj->rot));
+		k[1] = 2 * (SCALAR(oc, d) - (SCALAR(d, obj->rot) * SCALAR(oc, obj->rot)));
 		k[2] = SCALAR(oc, oc) - pow(SCALAR(oc, obj->rot), 2) - obj->r * obj->r;
 	}
 	if (!ft_strcmp(obj->type, "CONE"))
 	{
-		k[0] = SCALAR(d, d) - pow(SCALAR(d, obj->rot), 2) *\
-				(1 + pow(obj->r, 2));
-		k[1] = 2 * (SCALAR(oc, d) - SCALAR(d, obj->rot) *\
-				SCALAR(oc, obj->rot) * (1 + pow(obj->r, 2)));
-		k[2] = SCALAR(oc, oc) - pow(SCALAR(oc, obj->rot), 2) *\
-				(1 + pow(obj->r, 2));
+		k[0] = SCALAR(d, d) - (pow(SCALAR(d, obj->rot), 2) *\
+				(1 + pow(obj->r, 2)));
+		k[1] = 2 * (SCALAR(oc, d) - (SCALAR(d, obj->rot) *\
+				SCALAR(oc, obj->rot) * (1 + pow(obj->r, 2))));
+		k[2] = SCALAR(oc, oc) - (pow(SCALAR(oc, obj->rot), 2) *\
+				(1 + pow(obj->r, 2)));
 	}
 	return (k);
 }

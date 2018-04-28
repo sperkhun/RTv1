@@ -26,6 +26,30 @@ static void	draw_pixel(SDL_Surface *screen, int x, int y, t_vector col)
 	pix[a++] = col[0] > 255 ? 255 : col[0];
 }
 
+static void	rotation(t_vector *v, t_vector rot)
+{
+	double t;
+
+	if (rot[0] != 0)
+	{
+		t = (*v)[1];
+		(*v)[1] = t * cos(rot[0]) + (*v)[2] * sin(rot[0]);
+		(*v)[2] = -t * sin(rot[0]) + (*v)[2] * cos(rot[0]);
+	}
+	if (rot[1] != 0)
+	{
+		t = (*v)[0];
+		(*v)[0] = t * cos(rot[1]) + (*v)[2] * sin(rot[1]);
+		(*v)[2] = -t * sin(rot[1]) + (*v)[2] * cos(rot[1]);
+	}
+	if (rot[2] != 0)
+	{
+		t = (*v)[0];
+		(*v)[0] = t * cos(rot[2]) - (*v)[1] * sin(rot[2]);
+		(*v)[1] = t * sin(rot[2]) + (*v)[1] * cos(rot[2]);
+	}
+}
+
 void		draw(SDL_Surface *screen, t_scene scene)
 {
 	int			x;
@@ -40,7 +64,7 @@ void		draw(SDL_Surface *screen, t_scene scene)
 		{
 			scene.camera.vv = (t_vector){x * scene.camera.d / WIN_W, y *\
 				0.8 / WIN_H, 1.0};
-			scene.camera.vv += scene.camera.rot;
+			rotation(&scene.camera.vv, scene.camera.rot);
 			scene.camera.vv = DIV(scene.camera.vv, LENGTH(scene.camera.vv));
 			color = traceray(scene);
 			draw_pixel(screen, x + WIN_W / 2, WIN_H / 2 - y, color);
