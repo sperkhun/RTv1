@@ -21,8 +21,7 @@ t_vector	traceray(t_scene scene)
 
 	scene.t_min = 1;
 	scene.t_max = 10000;
-	a = intersection(&scene, scene.camera.ov, scene.camera.vv);
-	if (a < 0)
+	if ((a = intersection(&scene, scene.camera.ov, scene.camera.vv)) < 0)
 		return ((t_vector){0, 0, 0});
 	p = scene.camera.ov + MULT(scene.camera.vv, scene.cl_t);
 	i = (SCALAR(scene.camera.vv, scene.object[a].rot) * scene.cl_t) +\
