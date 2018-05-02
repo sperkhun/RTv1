@@ -33,7 +33,9 @@
 
 # define MULT(v, n) v * (t_vector){n, n, n}
 
-# define DIV(v, n) n ? v / (t_vector){n, n, n} : (t_vector){0, 0, 0};
+# define DIV(v, n) n ? v / (t_vector){n, n, n} : (t_vector){0, 0, 0}
+
+# define NORM(v) DIV(v, LENGTH(v))
 
 typedef double	t_vector __attribute__((vector_size(sizeof(double)*3)));
 
@@ -69,16 +71,18 @@ typedef struct	s_scene
 	t_light		*light;
 	t_object	*object;
 	double		cl_t;
+	double		t_min;
+	double		t_max;
+	int			shadows;
 	int			l;
 	int			o;
 }				t_scene;
 
 void			draw(SDL_Surface *screen, t_scene scene);
 t_vector		traceray(t_scene scene);
-double			lighting(t_vector p, t_vector n, t_vector v, t_scene scene,\
+double			lighting(t_vector p, t_vector n, t_scene scene,\
 							t_object object);
-int				intersection(t_scene *scene, t_vector o, t_vector v,\
-							double t_min, double t_max);
+int				intersection(t_scene *scene, t_vector o, t_vector v);
 void			read_scene(t_scene *scene, char *str);
 
 #endif

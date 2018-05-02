@@ -82,6 +82,11 @@ void			read_obj(t_object *object, int fd)
 	{
 		if (i == 4 && !ft_strcmp(object->type, "SPHERE"))
 			break ;
+		if (i == 1 && !ft_strcmp(object->type, "PLANE"))
+		{
+			i++;
+			continue ;
+		}
 		get_next_line(fd, &line);
 		if (i == 0)
 			object->specular = ft_atoi(line);
@@ -132,16 +137,23 @@ void			read_scene(t_scene *scene, char *str)
 	fd = open(str, O_RDONLY);
 	o = 0;
 	l = 0;
+	scene->shadows = 0;
 	while (get_next_line(fd, &line) > 0)
 	{
 		s = ft_strtrim(line);
-		if (!ft_strcmp(s, "LIGHT"))
+		if (!ft_strcmp(s, "SHADOWS"))
+		{
+			free(s);
+			scene->shadows = 1;
+		}
+		else if (!ft_strcmp(s, "LIGHT"))
 		{
 			read_light(&scene->light[l], fd);
 			free(s);
 			l++;
 		}
-		else if (!ft_strcmp(s, "CYLINDER") || !ft_strcmp(line, "CONE") || !ft_strcmp(line, "SPHERE"))
+		else if (!ft_strcmp(s, "CYLINDER") || !ft_strcmp(s, "CONE") ||\
+			!ft_strcmp(s, "SPHERE") || !ft_strcmp(s, "PLANE"))
 		{
 			scene->object[o].type = s;
 			read_obj(&scene->object[o], fd);
