@@ -14,7 +14,7 @@ NAME = rtv1
 
 FLAGS = -Wall -Wextra -Werror
 
-SRC = main.c draw.c intersection.c lighting.c traceray.c read_scene.c
+SRC = main.c draw.c intersection.c lighting.c traceray.c read_scene.c read_objects.c sdl.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -31,7 +31,7 @@ $(NAME): $(OBJ)
 	@gcc $(FLAGS) -o $(NAME) $(OBJ) $(LIBML) $(LIBFT)
 	@echo Creating $(NAME)
 
-%.o: %.c
+%.o: %.c rtv1.h
 	@gcc $(FLAGS) -c $< -o $@ $(INCL) -pthread
 
 clean:

@@ -12,14 +12,7 @@
 
 #include "rtv1.h"
 
-void			iserr(void)
-{
-	ft_putendl("ERROR");
-	system("leaks rtv1");
-	exit(0);
-}
-
-static void		count_objects(char *str, t_scene *scene)
+static void	count_objects(char *str, t_scene *scene)
 {
 	int		fd;
 	char	*line;
@@ -42,131 +35,54 @@ static void		count_objects(char *str, t_scene *scene)
 	close(fd);
 }
 
-static t_vector	read_vector(char *str, int s)
+static int	check_objects(t_scene *scene, int fd, int *l, int *o)
 {
-	t_vector	v;
-	int			i;
-
-	i = 0;
-	if (!(str = ft_strchr(str, '{')))
-		iserr();
-	str++;
-	while (i < 3)
-	{
-		!*str ? iserr() : 0;
-		v[i] = (double)ft_atoi(str);
-		!s ? v[i] /= 10 : 0;
-		if (!(str = ft_strchr(str, ',')) && i < 2)
-			iserr();
-		str++;
-		i++;
-	}
-	return (v);
-}
-
-static void		read_light(t_light *light, int fd)
-{
+	int		n;
 	char	*line;
-	int		i;
 
-	i = 0;
-	while (i < 2)
+	if ((n = get_next_line(fd, &line)) > 0)
 	{
-		get_next_line(fd, &line);
-		if (i == 0)
-			light->intensity = (double)ft_atoi(line) / 10;
-		else if (i == 1)
-			light->v = read_vector(line, 0);
-		i++;
-		free(line);
+		if (!ft_strncmp(line, "SHADOWS", 6))
+			scene->shadows = 1;
+		else if (!ft_strncmp(line, "LIGHT", 5))
+			read_light(&scene->light[(*l)++], fd);
+		else if (!ft_strncmp(line, "CYLINDER", 8) ||\
+				!ft_strncmp(line, "CONE", 4) || !ft_strncmp(line, "SPHERE", 6)\
+				|| !ft_strncmp(line, "PLANE", 5))
+		{
+			scene->object[*o].type = line;
+			read_obj(&scene->object[(*o)++], fd);
+		}
+		else if (!ft_strncmp(line, "CAMERA", 6) && *l == 0 && *o == 0)
+			read_camera(&scene->camera, fd);
+		else
+			iserr(ft_strjoin("Wrong object: ", line));
+		!ft_strncmp(line, "SHADOWS", 6) || !ft_strncmp(line, "LIGHT", 5) ||\
+					!ft_strncmp(line, "CAMERA", 6) ? free(line) : 0;
 	}
+	n == 0 ? free(line) : 0;
+	return (n);
 }
 
-void			read_obj(t_object *object, int fd)
-{
-	char	*line;
-	int		i;
-
-	i = 0;
-	while (i < 5)
-	{
-		if (i == 4 && !ft_strcmp(object->type, "SPHERE"))
-			break ;
-		if (i == 1 && !ft_strcmp(object->type, "PLANE"))
-			i++;
-		get_next_line(fd, &line);
-		if (i == 0)
-			object->specular = ft_atoi(line);
-		if (i == 1)
-			object->r = (double)ft_atoi(line) / 10;
-		if (i == 2)
-			object->v = read_vector(line, 0);
-		if (i == 3)
-			object->col = read_vector(line, 1);
-		if (i == 4)
-			object->rot = NORM(read_vector(line, 0));
-		i++;
-		free(line);
-	}
-}
-
-void			read_camera(t_camera *camera, int fd)
-{
-	char	*line;
-	int		i;
-
-	i = 0;
-	camera->d = 1;
-	while (i < 2)
-	{
-		get_next_line(fd, &line);
-		if (i == 0)
-			camera->ov = read_vector(line, 0);
-		if (i == 1)
-			camera->rot = read_vector(line, 0);
-		i++;
-		free(line);
-	}
-}
-
-void			read_scene(t_scene *scene, char *str)
+void		read_scene(t_scene *scene, char *str)
 {
 	int		fd;
 	int		l;
 	int		o;
-	char	*line;
-	char	*s;
 
 	count_objects(str, scene);
 	fd = open(str, O_RDONLY);
 	o = 0;
 	l = 0;
 	scene->shadows = 0;
-	while (get_next_line(fd, &line) > 0)
-	{
-		s = ft_strtrim(line);
-		if (!ft_strcmp(s, "SHADOWS"))
-			scene->shadows = 1;
-		else if (!ft_strcmp(s, "LIGHT"))
-		{
-			read_light(&scene->light[l], fd);
-			l++;
-		}
-		else if (!ft_strcmp(s, "CYLINDER") || !ft_strcmp(s, "CONE") ||\
-			!ft_strcmp(s, "SPHERE") || !ft_strcmp(s, "PLANE"))
-		{
-			scene->object[o].type = s;
-			read_obj(&scene->object[o], fd);
-			o++;
-		}
-		else if (!ft_strcmp(s, "CAMERA") && l == 0 && o == 0)
-			read_camera(&scene->camera, fd);
-		else
-			iserr();
-		!ft_strcmp(s, "SHADOWS") || !ft_strcmp(s, "LIGHT") ||\
-					!ft_strcmp(s, "CAMERA") ? free(s) : 0;
-		free(line);
-	}
-	free(line);
+	while (check_objects(scene, fd, &l, &o) > 0)
+		;
 	close(fd);
+}
+
+void		iserr(char *str)
+{
+	ft_putendl(str);
+	system("leaks rtv1");
+	exit(0);
 }

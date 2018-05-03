@@ -15,33 +15,27 @@
 int	main(int argc, char **argv)
 {
 	int			running;
-	SDL_Event	event;
-	SDL_Window	*win;
-	SDL_Surface	*screen;
 	t_scene		scene;
 
 	if (argc != 2)
-		return (0);
+		iserr("Usage: ./rtv1 scene");
 	running = 1;
 	SDL_Init(SDL_INIT_EVERYTHING);
-	win = SDL_CreateWindow("Hello SDL World", SDL_WINDOWPOS_UNDEFINED,\
-			SDL_WINDOWPOS_UNDEFINED, WIN_W, WIN_H, SDL_WINDOW_ALLOW_HIGHDPI);
-	if (NULL == win)
-		exit(1);
-	screen = SDL_GetWindowSurface(win);
+	open_window(&scene);
 	read_scene(&scene, argv[1]);
-	ft_memset(screen->pixels, 0, screen->h * screen->pitch);
-	draw(screen, scene);
-	SDL_UpdateWindowSurface(win);
+	ft_memset(scene.screen->pixels, 0, scene.screen->h * scene.screen->pitch);
+	draw(scene.screen, scene);
+	SDL_UpdateWindowSurface(scene.win);
 	while (running)
-		while (SDL_PollEvent(&event))
+		while (SDL_PollEvent(&scene.event))
 		{
-			if ((SDL_QUIT == event.type) || (SDL_KEYDOWN == event.type &&\
-					SDL_SCANCODE_ESCAPE == event.key.keysym.scancode))
+			if ((SDL_QUIT == scene.event.type) ||\
+					(SDL_KEYDOWN == scene.event.type &&\
+					SDL_SCANCODE_ESCAPE == scene.event.key.keysym.scancode))
 				running = 0;
 		}
-	SDL_FreeSurface(screen);
-	SDL_DestroyWindow(win);
+	SDL_FreeSurface(scene.screen);
+	SDL_DestroyWindow(scene.win);
 	SDL_Quit();
 	system("leaks rtv1");
 	return (0);

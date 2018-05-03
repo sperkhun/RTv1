@@ -67,6 +67,9 @@ typedef struct	s_light
 
 typedef struct	s_scene
 {
+	SDL_Event	event;
+	SDL_Window	*win;
+	SDL_Surface	*screen;
 	t_camera	camera;
 	t_light		*light;
 	t_object	*object;
@@ -78,11 +81,16 @@ typedef struct	s_scene
 	int			o;
 }				t_scene;
 
+void			open_window(t_scene *scene);
 void			draw(SDL_Surface *screen, t_scene scene);
 t_vector		traceray(t_scene scene);
 double			lighting(t_vector p, t_vector n, t_scene scene,\
 							t_object object);
 int				intersection(t_scene *scene, t_vector o, t_vector v);
 void			read_scene(t_scene *scene, char *str);
+void			read_light(t_light *light, int fd);
+void			read_obj(t_object *object, int fd);
+void			read_camera(t_camera *camera, int fd);
+void			iserr(char *str);
 
 #endif
