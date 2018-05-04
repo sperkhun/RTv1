@@ -16,6 +16,6 @@ void	open_window(t_scene *scene)
 {
 	if (!(scene->win = SDL_CreateWindow("RTv1", SDL_WINDOWPOS_UNDEFINED,\
 			SDL_WINDOWPOS_UNDEFINED, WIN_W, WIN_H, SDL_WINDOW_ALLOW_HIGHDPI)))
-		iserr("Window error");
+		iserr("Error", 0);
 	scene->screen = SDL_GetWindowSurface(scene->win);
 }

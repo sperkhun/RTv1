@@ -16,26 +16,29 @@ static double	ft_atof(char *s)
 {
 	double	i;
 	int		a;
+	int		l;
 
 	i = ft_atoi(s);
 	a = -1;
+	l = 1;
 	while (ft_isspace(*s))
 		s++;
 	if (*s == '+' || *s == '-')
+	{
+		l = *s == '-' && !i ? -1 : 1;
 		s++;
+	}
 	while (ft_isdigit(*s))
 		s++;
 	if (*s == '.')
 		s++;
-	else
-		return (i);
 	while (ft_isdigit(*s))
 	{
 		i += (*s - 48) * pow(10, a);
 		s++;
 		a--;
 	}
-	return (i);
+	return (i * l);
 }
 
 static t_vector	read_vector(char *string, int s)
@@ -46,14 +49,14 @@ static t_vector	read_vector(char *string, int s)
 
 	i = 0;
 	if (!(str = ft_strchr(string, '{')))
-		iserr(ft_strjoin("Wrong vector: ", string));
+		iserr(ft_strjoin("Wrong vector: ", string), 1);
 	str++;
 	while (i < 3)
 	{
-		!*str ? iserr(ft_strjoin("Wrong vector: ", string)) : 0;
+		!*str ? iserr(ft_strjoin("Wrong vector: ", string), 1) : 0;
 		v[i] = !s ? ft_atof(str) : ft_atoi(str);
 		if (!(str = ft_strchr(str, ',')) && i < 2)
-			iserr(ft_strjoin("Wrong vector: ", string));
+			iserr(ft_strjoin("Wrong vector: ", string), 1);
 		str++;
 		i++;
 	}
@@ -83,8 +86,8 @@ void			read_obj(t_object *object, int fd)
 	char	*line;
 	int		i;
 
-	i = 0;
-	while (i < 5)
+	i = -1;
+	while (++i < 5)
 	{
 		if (i == 4 && !ft_strcmp(object->type, "SPHERE"))
 			break ;
@@ -94,14 +97,15 @@ void			read_obj(t_object *object, int fd)
 		if (i == 0)
 			object->specular = ft_atoi(line);
 		if (i == 1)
-			object->r = ft_atof(line);
+			(object->r = ft_atof(line)) >= 3.14 &&\
+				!ft_strcmp(object->type, "CONE") ? iserr("Wrong cone", 1) : 0;
 		if (i == 2)
 			object->v = read_vector(line, 0);
 		if (i == 3)
 			object->col = read_vector(line, 1);
 		if (i == 4)
 			object->rot = NORM(read_vector(line, 0));
-		i++;
+		i == 4 && !(LENGTH(object->rot)) ? iserr("Wrong axis vector", 1) : 0;
 		free(line);
 	}
 }

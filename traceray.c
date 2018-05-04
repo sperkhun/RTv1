@@ -35,7 +35,7 @@ t_vector	traceray(t_scene scene)
 		n = p - scene.object[a].v - MULT(scene.object[a].rot, i);
 	if (!ft_strcmp(scene.object[a].type, "CONE"))
 		n = p - scene.object[a].v - MULT(scene.object[a].rot, (i *\
-			(1 + pow(scene.object[a].r, 2))));
+			(1 + pow(tan(scene.object[a].r / 2), 2))));
 	n = DIV(n, LENGTH(n));
 	i = lighting(p, n, scene, scene.object[a]);
 	return (MULT(scene.object[a].col, i));

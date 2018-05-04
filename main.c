@@ -18,7 +18,7 @@ int	main(int argc, char **argv)
 	t_scene		scene;
 
 	if (argc != 2)
-		iserr("Usage: ./rtv1 scene");
+		iserr("Usage: ./rtv1 scene", 1);
 	running = 1;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	open_window(&scene);

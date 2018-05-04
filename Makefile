@@ -20,7 +20,7 @@ OBJ = $(SRC:.c=.o)
 
 LIBFT = -L ./libft/ -lft
 
-LIBML = -F ~/Library/Frameworks/ -framework SDL2 -framework SDL2_mixer
+LISDL = -F ~/Library/Frameworks/ -framework SDL2 -framework SDL2_mixer
 
 INCL = -I ./libft/includes/ -I ~/Library/Frameworks/SDL2.framework/Versions/A/Headers
 
@@ -28,7 +28,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@make -C ./libft/
-	@gcc $(FLAGS) -o $(NAME) $(OBJ) $(LIBML) $(LIBFT)
+	@gcc $(FLAGS) -o $(NAME) $(OBJ) $(LISDL) $(LIBFT)
 	@echo Creating $(NAME)
 
 %.o: %.c rtv1.h

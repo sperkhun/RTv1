@@ -91,6 +91,6 @@ void			read_scene(t_scene *scene, char *str);
 void			read_light(t_light *light, int fd);
 void			read_obj(t_object *object, int fd);
 void			read_camera(t_camera *camera, int fd);
-void			iserr(char *str);
+void			iserr(char *str, int i);
 
 #endif
