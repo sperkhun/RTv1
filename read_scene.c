@@ -90,6 +90,6 @@ void		read_scene(t_scene *scene, char *str)
 void		iserr(char *str, int i)
 {
 	!i ? perror(str) : ft_putendl(str);
-	system("leaks rtv1");
+	system("leaks RTv1");
 	exit(0);
 }

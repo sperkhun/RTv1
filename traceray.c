@@ -19,8 +19,8 @@ t_vector	traceray(t_scene scene)
 	double		i;
 	int			a;
 
-	scene.t_min = 1;
-	scene.t_max = 10000;
+	scene.t_min = 0;
+	scene.t_max = T_MAX;
 	if ((a = intersection(&scene, scene.camera.ov, scene.camera.vv)) < 0)
 		return ((t_vector){0, 0, 0});
 	p = scene.camera.ov + MULT(scene.camera.vv, scene.cl_t);
@@ -37,6 +37,7 @@ t_vector	traceray(t_scene scene)
 		n = p - scene.object[a].v - MULT(scene.object[a].rot, (i *\
 			(1 + pow(tan(scene.object[a].r / 2), 2))));
 	n = DIV(n, LENGTH(n));
-	i = lighting(p, n, scene, scene.object[a]);
-	return (MULT(scene.object[a].col, i));
+	// i = lighting(p, n, scene, scene.object[a]);
+	// return (MULT(scene.object[a].col, i));
+	return(lighting(p, n, scene, scene.object[a]));
 }

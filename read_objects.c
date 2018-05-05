@@ -116,7 +116,6 @@ void			read_camera(t_camera *camera, int fd)
 	int		i;
 
 	i = 0;
-	camera->d = 1;
 	while (i < 2)
 	{
 		get_next_line(fd, &line);

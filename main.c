@@ -37,6 +37,6 @@ int	main(int argc, char **argv)
 	SDL_FreeSurface(scene.screen);
 	SDL_DestroyWindow(scene.win);
 	SDL_Quit();
-	system("leaks rtv1");
+	system("leaks RTv1");
 	return (0);
 }

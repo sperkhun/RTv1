@@ -62,8 +62,8 @@ void		draw(SDL_Surface *screen, t_scene scene)
 		x = -(WIN_W / 2);
 		while (x < WIN_W / 2)
 		{
-			scene.camera.vv = (t_vector){x * scene.camera.d / WIN_W, y *\
-				0.8 / WIN_H, scene.camera.d};
+			scene.camera.vv = (t_vector){x * WIN_W / (1000.0 * WIN_W), y *\
+				WIN_H / (1000.0 * WIN_H), 1.0};
 			rotation(&scene.camera.vv, scene.camera.rot);
 			scene.camera.vv = DIV(scene.camera.vv, LENGTH(scene.camera.vv));
 			color = traceray(scene);

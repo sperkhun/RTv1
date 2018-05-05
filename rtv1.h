@@ -27,6 +27,8 @@
 
 # define WIN_W 1000
 
+# define T_MAX 100000
+
 # define SCALAR(v1, v2) ((v1 * v2)[0] + (v1 * v2)[1] + (v1 * v2)[2])
 
 # define LENGTH(v) sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
@@ -56,7 +58,6 @@ typedef struct	s_camera
 	t_vector	ov;
 	t_vector	vv;
 	t_vector	rot;
-	double		d;
 }				t_camera;
 
 typedef struct	s_light
@@ -84,7 +85,7 @@ typedef struct	s_scene
 void			open_window(t_scene *scene);
 void			draw(SDL_Surface *screen, t_scene scene);
 t_vector		traceray(t_scene scene);
-double			lighting(t_vector p, t_vector n, t_scene scene,\
+t_vector		lighting(t_vector p, t_vector n, t_scene scene,\
 							t_object object);
 int				intersection(t_scene *scene, t_vector o, t_vector v);
 void			read_scene(t_scene *scene, char *str);

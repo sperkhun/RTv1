@@ -50,9 +50,9 @@ static void		object_intersec(t_vector o, t_vector d, t_object *object)
 	oc = o - object->v;
 	if (!ft_strcmp(object->type, "PLANE"))
 	{
-		object->t1 = SCALAR(d, object->rot) == 0 ? 10001 :\
+		object->t1 = SCALAR(d, object->rot) == 0 ? -1 :\
 				-(SCALAR(oc, object->rot)) / SCALAR(d, object->rot);
-		object->t2 = 10001;
+		object->t2 = -1;
 	}
 	else
 	{
@@ -60,8 +60,8 @@ static void		object_intersec(t_vector o, t_vector d, t_object *object)
 		disc = k[1] * k[1] - 4 * k[0] * k[2];
 		if (disc < 0)
 		{
-			object->t1 = 10001;
-			object->t2 = 10001;
+			object->t1 = -1;
+			object->t2 = -1;
 			return ;
 		}
 		object->t1 = (-k[1] + sqrt(disc)) / (2 * k[0]);
