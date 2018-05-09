@@ -16,15 +16,15 @@ t_vector	traceray(t_scene scene)
 {
 	t_vector	p;
 	t_vector	n;
-	double		i;
+	double		m;
 	int			a;
 
-	scene.t_min = 0;
+	scene.t_min = 0.00001;
 	scene.t_max = T_MAX;
 	if ((a = intersection(&scene, scene.camera.ov, scene.camera.vv)) < 0)
 		return ((t_vector){0, 0, 0});
 	p = scene.camera.ov + MULT(scene.camera.vv, scene.cl_t);
-	i = (SCALAR(scene.camera.vv, scene.object[a].rot) * scene.cl_t) +\
+	m = (SCALAR(scene.camera.vv, scene.object[a].rot) * scene.cl_t) +\
 			SCALAR((scene.camera.ov - scene.object[a].v), scene.object[a].rot);
 	if (!ft_strcmp(scene.object[a].type, "PLANE"))
 		n = SCALAR(scene.camera.vv, scene.object[a].rot) < 0 ?\
@@ -32,12 +32,10 @@ t_vector	traceray(t_scene scene)
 	if (!ft_strcmp(scene.object[a].type, "SPHERE"))
 		n = p - scene.object[a].v;
 	if (!ft_strcmp(scene.object[a].type, "CYLINDER"))
-		n = p - scene.object[a].v - MULT(scene.object[a].rot, i);
+		n = p - scene.object[a].v - MULT(scene.object[a].rot, m);
 	if (!ft_strcmp(scene.object[a].type, "CONE"))
-		n = p - scene.object[a].v - MULT(scene.object[a].rot, (i *\
+		n = p - scene.object[a].v - MULT(scene.object[a].rot, (m *\
 			(1 + pow(tan(scene.object[a].r / 2), 2))));
 	n = DIV(n, LENGTH(n));
-	// i = lighting(p, n, scene, scene.object[a]);
-	// return (MULT(scene.object[a].col, i));
-	return(lighting(p, n, scene, scene.object[a]));
+	return (lighting(p, n, scene, scene.object[a]));
 }

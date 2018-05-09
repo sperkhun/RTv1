@@ -97,7 +97,7 @@ void			read_obj(t_object *object, int fd)
 		if (i == 0)
 			object->specular = ft_atoi(line);
 		if (i == 1)
-			(object->r = ft_atof(line)) >= 3.14 &&\
+			(object->r = ft_atof(line)) > 3.12 &&\
 				!ft_strcmp(object->type, "CONE") ? iserr("Wrong cone", 1) : 0;
 		if (i == 2)
 			object->v = read_vector(line, 0);

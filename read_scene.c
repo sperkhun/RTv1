@@ -69,6 +69,7 @@ static int	check_objects(t_scene *scene, int fd, int *l, int *o)
 
 void		read_scene(t_scene *scene, char *str)
 {
+	double	i;
 	int		fd;
 	int		l;
 	int		o;
@@ -79,11 +80,16 @@ void		read_scene(t_scene *scene, char *str)
 	o = 0;
 	l = 0;
 	n = 1;
+	i = 0.0;
 	scene->shadows = 0;
 	while (n > 0)
 		n = check_objects(scene, fd, &l, &o) > 0;
 	if (n < 0)
 		iserr("Error", 0);
+	n = -1;
+	while (++n < l)
+		i += scene->light[n].intensity;
+	i > 1 ? iserr("The sum of light intensity must be less or equal 1", 1) : 0;
 	close(fd);
 }
 
