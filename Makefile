@@ -14,25 +14,25 @@ NAME = RTv1
 
 FLAGS = -Wall -Wextra -Werror
 
-SRC = main.c draw.c intersection.c lighting.c traceray.c read_scene.c read_objects.c sdl.c
+SRC = main.c draw.c intersection.c lighting.c traceray.c read_scene.c read_objects.c mlx.c
 
 OBJ = $(SRC:.c=.o)
 
 LIBFT = -L ./libft/ -lft
 
-LISDL = -F ~/Library/Frameworks/ -framework SDL2 -framework SDL2_mixer
+LIBMLX = -L /usr/local/lib/ -lmlx  -framework OpenGL -framework AppKit
 
-INCL = -I ./libft/includes/ -I ~/Library/Frameworks/SDL2.framework/Versions/A/Headers
+INCL = -I ./libft/includes/ -I /usr/local/include
 
 all: $(NAME)
 
+%.o: %.c rtv1.h
+	@gcc $(FLAGS) -c $< -o $@ $(INCL)
+
 $(NAME): $(OBJ)
 	@make -C ./libft/
-	@gcc $(FLAGS) -o $(NAME) $(OBJ) $(LISDL) $(LIBFT)
+	@gcc $(FLAGS) -o $(NAME) $(OBJ) $(LIBMLX) $(LIBFT)
 	@echo Creating $(NAME)
-
-%.o: %.c rtv1.h
-	@gcc $(FLAGS) -c $< -o $@ $(INCL) -pthread
 
 clean:
 	@/bin/rm -f $(OBJ)
@@ -41,4 +41,5 @@ clean:
 fclean: clean
 	@/bin/rm -f $(NAME)
 	@make -C ./libft/ fclean
+
 re: fclean all

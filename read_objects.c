@@ -55,6 +55,7 @@ static t_vector	read_vector(char *string, int s)
 	{
 		!*str ? iserr(ft_strjoin("Wrong vector: ", string), 1) : 0;
 		v[i] = !s ? ft_atof(str) : ft_atoi(str);
+		s && v[i] < 0 ? v[i] = 0 : v[i];
 		if (!(str = ft_strchr(str, ',')) && i < 2)
 			iserr(ft_strjoin("Wrong vector: ", string), 1);
 		str++;
@@ -73,7 +74,8 @@ void			read_light(t_light *light, int fd)
 	{
 		get_next_line(fd, &line);
 		if (i == 0)
-			light->intensity = ft_atof(line);
+			(light->intensity = ft_atof(line)) < 0 ?\
+						iserr("Wrong light intensity", 1) : 0;
 		else if (i == 1)
 			light->v = read_vector(line, 0);
 		i++;

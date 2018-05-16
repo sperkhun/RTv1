@@ -33,7 +33,7 @@ t_vector	lighting(t_vector p, t_vector n, t_scene scene, t_object object)
 		{
 			l = MULT(n, 2 * SCALAR(n, l)) - l;
 			v = SCALAR(l, -scene.camera.vv);
-			object.col += v > 0 ? MULT(((t_vector){170, 170, 170}), (pow(v /\
+			object.col += v > 0 ? MULT(((t_vector){190, 190, 190}), (pow(v /\
 				(LENGTH(l) * LENGTH(-scene.camera.vv)), object.specular)) *\
 				scene.light[a].intensity) : (t_vector){0, 0, 0};
 		}

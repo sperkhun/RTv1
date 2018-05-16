@@ -20,8 +20,7 @@
 # include <fcntl.h>
 # include <stdlib.h>
 # include <stdio.h>
-# include <pthread.h>
-# include <SDL.h>
+# include "mlx.h"
 
 # define WIN_H 800
 
@@ -68,9 +67,13 @@ typedef struct	s_light
 
 typedef struct	s_scene
 {
-	SDL_Event	event;
-	SDL_Window	*win;
-	SDL_Surface	*screen;
+	void		*mlx;
+	void		*win;
+	void		*img;
+	char		*pxl_img;
+	int			bpp;
+	int			s_line;
+	int			ed;
 	t_camera	camera;
 	t_light		*light;
 	t_object	*object;
@@ -83,7 +86,7 @@ typedef struct	s_scene
 }				t_scene;
 
 void			open_window(t_scene *scene);
-void			draw(SDL_Surface *screen, t_scene scene);
+void			draw(t_scene scene);
 t_vector		traceray(t_scene scene);
 t_vector		lighting(t_vector p, t_vector n, t_scene scene,\
 							t_object object);
@@ -93,5 +96,7 @@ void			read_light(t_light *light, int fd);
 void			read_obj(t_object *object, int fd);
 void			read_camera(t_camera *camera, int fd);
 void			iserr(char *str, int i);
+int				key_hook(int key, t_scene *scene);
+int				exit_x(t_scene *scene);
 
 #endif

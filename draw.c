@@ -12,15 +12,15 @@
 
 #include "rtv1.h"
 
-static void	draw_pixel(SDL_Surface *screen, int x, int y, t_vector col)
+static void	draw_pixel(t_scene *scene, int x, int y, t_vector col)
 {
 	unsigned char	*pix;
 	int				a;
 
 	if (x < 0 || y < 0 || x >= WIN_W || y >= WIN_H)
 		return ;
-	pix = (unsigned char*)screen->pixels;
-	a = x * 4 + y * screen->pitch;
+	pix = (unsigned char*)scene->pxl_img;
+	a = x * 4 + y * scene->s_line;
 	pix[a++] = col[2] > 255 ? 255 : (int)col[2];
 	pix[a++] = col[1] > 255 ? 255 : (int)col[1];
 	pix[a++] = col[0] > 255 ? 255 : (int)col[0];
@@ -50,14 +50,14 @@ static void	rotation(t_vector *v, t_vector rot)
 	}
 }
 
-void		draw(SDL_Surface *screen, t_scene scene)
+void		draw(t_scene scene)
 {
 	int			x;
 	int			y;
 	t_vector	color;
 
-	y = -(WIN_H / 2);
-	while (y < WIN_H / 2)
+	y = -(WIN_H / 2) + 1;
+	while (y <= WIN_H / 2)
 	{
 		x = -(WIN_W / 2);
 		while (x < WIN_W / 2)
@@ -67,7 +67,7 @@ void		draw(SDL_Surface *screen, t_scene scene)
 			rotation(&scene.camera.vv, scene.camera.rot);
 			scene.camera.vv = DIV(scene.camera.vv, LENGTH(scene.camera.vv));
 			color = traceray(scene);
-			draw_pixel(screen, x + WIN_W / 2, WIN_H / 2 - y, color);
+			draw_pixel(&scene, x + WIN_W / 2, WIN_H / 2 - y, color);
 			x++;
 		}
 		y++;

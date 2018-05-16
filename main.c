@@ -14,29 +14,16 @@
 
 int	main(int argc, char **argv)
 {
-	int			running;
 	t_scene		scene;
 
 	if (argc != 2)
 		iserr("Usage: ./rtv1 scene", 1);
-	running = 1;
-	SDL_Init(SDL_INIT_EVERYTHING);
 	open_window(&scene);
 	read_scene(&scene, argv[1]);
-	ft_memset(scene.screen->pixels, 0, scene.screen->h * scene.screen->pitch);
-	draw(scene.screen, scene);
-	SDL_UpdateWindowSurface(scene.win);
-	while (running)
-		while (SDL_PollEvent(&scene.event))
-		{
-			if ((SDL_QUIT == scene.event.type) ||\
-					(SDL_KEYDOWN == scene.event.type &&\
-					SDL_SCANCODE_ESCAPE == scene.event.key.keysym.scancode))
-				running = 0;
-		}
-	SDL_FreeSurface(scene.screen);
-	SDL_DestroyWindow(scene.win);
-	SDL_Quit();
-	system("leaks RTv1");
+	draw(scene);
+	mlx_put_image_to_window(scene.mlx, scene.win, scene.img, 0, 0);
+	mlx_hook(scene.win, 17, 5, exit_x, &scene);
+	mlx_hook(scene.win, 2, 5, key_hook, &scene);
+	mlx_loop(scene.mlx);
 	return (0);
 }
